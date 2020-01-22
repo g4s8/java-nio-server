@@ -3,44 +3,32 @@ package com.jenkov.nioserver;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by jjenkov on 24-10-2015.
  */
 public class Server {
 
-    private SocketAccepter  socketAccepter  = null;
-    private SocketProcessor socketProcessor = null;
+    private final SocketAccepter socketAccepter;
 
-    private int tcpPort = 0;
-    private IMessageReaderFactory messageReaderFactory = null;
-    private IMessageProcessor     messageProcessor = null;
+    private final SocketProcessor socketProcessor;
 
-    public Server(int tcpPort, IMessageReaderFactory messageReaderFactory, IMessageProcessor messageProcessor) {
-        this.tcpPort = tcpPort;
-        this.messageReaderFactory = messageReaderFactory;
-        this.messageProcessor = messageProcessor;
+    public Server(
+        final int port,
+        final IMessageReaderFactory messageReaderFactory,
+        final IMessageProcessor messageProcessor
+    ) throws IOException {
+        final Queue<Socket> queue = new ArrayBlockingQueue<>(1024);
+        this.socketProcessor = new SocketProcessor(
+            queue,
+            new MessageBuffer(), new MessageBuffer(),
+            messageReaderFactory, messageProcessor
+        );
+        this.socketAccepter = new SocketAccepter(port, queue);
     }
 
-    public void start() throws IOException {
-
-        Queue socketQueue = new ArrayBlockingQueue(1024); //move 1024 to ServerConfig
-
-        this.socketAccepter  = new SocketAccepter(tcpPort, socketQueue);
-
-
-        MessageBuffer readBuffer  = new MessageBuffer();
-        MessageBuffer writeBuffer = new MessageBuffer();
-
-        this.socketProcessor = new SocketProcessor(socketQueue, readBuffer, writeBuffer,  this.messageReaderFactory, this.messageProcessor);
-
-        Thread accepterThread  = new Thread(this.socketAccepter);
-        Thread processorThread = new Thread(this.socketProcessor);
-
-        accepterThread.start();
-        processorThread.start();
+    public void start() {
+        new Thread(this.socketAccepter).start();
+        new Thread(this.socketProcessor).start();
     }
-
-
 }
