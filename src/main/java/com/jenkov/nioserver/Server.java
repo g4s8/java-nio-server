@@ -13,16 +13,11 @@ public class Server {
 
     private final SocketProcessor socketProcessor;
 
-    public Server(
-        final int port,
-        final IMessageReaderFactory messageReaderFactory,
-        final IMessageProcessor messageProcessor
-    ) throws IOException {
+    public Server(final int port, final IMessageProcessor messageProcessor) throws IOException {
         final Queue<Socket> queue = new ArrayBlockingQueue<>(1024);
         this.socketProcessor = new SocketProcessor(
-            queue,
-            new MessageBuffer(), new MessageBuffer(),
-            messageReaderFactory, messageProcessor
+            queue, new MessageBuffer(), new MessageBuffer(),
+            messageProcessor
         );
         this.socketAccepter = new SocketAccepter(port, queue);
     }
