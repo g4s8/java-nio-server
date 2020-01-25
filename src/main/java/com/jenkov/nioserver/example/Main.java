@@ -1,11 +1,7 @@
 package com.jenkov.nioserver.example;
 
 import com.jenkov.nioserver.*;
-import com.jenkov.nioserver.http.HttpMessageReaderFactory;
-
 import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by jjenkov on 19-10-2015.
@@ -32,7 +28,7 @@ public class Main {
             writeProxy.enqueue(response);
         };
 
-        Server server = new Server(9999, new HttpMessageReaderFactory(), messageProcessor);
+        Server server = new Server(9999, messageProcessor);
 
         server.start();
 

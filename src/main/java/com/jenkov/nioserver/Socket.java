@@ -1,5 +1,6 @@
 package com.jenkov.nioserver;
 
+import com.jenkov.nioserver.http.MessageReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -12,7 +13,7 @@ public class Socket {
     public long socketId;
 
     public SocketChannel  socketChannel = null;
-    public IMessageReader messageReader = null;
+    public MessageReader messageReader = null;
     public MessageWriter  messageWriter = null;
 
     public boolean endOfStreamReached = false;
